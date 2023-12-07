@@ -292,9 +292,10 @@ func TestConfigWithOAuth(t *testing.T) {
 	router := echo.New()
 
 	swaggerHandler := EchoWrapHandler(OAuth(&OAuthConfig{
-		ClientId: "my-client-id",
-		Realm:    "my-realm",
-		AppName:  "My App Name",
+		ClientId:                    "my-client-id",
+		Realm:                       "my-realm",
+		AppName:                     "My App Name",
+		AdditionalQueryStringParams: []QueryStringParam{{Key: "a", Value: "b"}},
 	}))
 	router.GET("/*", swaggerHandler)
 
@@ -304,9 +305,12 @@ func TestConfigWithOAuth(t *testing.T) {
 	assert.Contains(t, body, `ui.initOAuth({
     clientId: "my-client-id",
     realm: "my-realm",
-    appName: "My App Name"
+    appName: "My App Name",
+    additionalQueryStringParams: { "a":"b" }
   })`)
 }
+
+// \n\trealm: \"my-realm\",\n\tappName: \"My App Name\",\n    additionalQueryStringParams: { \"a\":\"b\" }\n  })
 
 func TestHandlerReuse(t *testing.T) {
 	router := echo.New()
@@ -416,14 +420,16 @@ func TestPersistAuthorization(t *testing.T) {
 func TestOAuth(t *testing.T) {
 	var cfg Config
 	expected := OAuthConfig{
-		ClientId: "my-client-id",
-		Realm:    "my-realm",
-		AppName:  "My App Name",
+		ClientId:                    "my-client-id",
+		Realm:                       "my-realm",
+		AppName:                     "My App Name",
+		AdditionalQueryStringParams: []QueryStringParam{{Key: "a", Value: "b"}},
 	}
 	OAuth(&expected)(&cfg)
 	assert.Equal(t, expected.ClientId, cfg.OAuth.ClientId)
 	assert.Equal(t, expected.Realm, cfg.OAuth.Realm)
 	assert.Equal(t, expected.AppName, cfg.OAuth.AppName)
+	assert.Equal(t, expected.AdditionalQueryStringParams, cfg.OAuth.AdditionalQueryStringParams)
 }
 
 func TestOAuthNil(t *testing.T) {

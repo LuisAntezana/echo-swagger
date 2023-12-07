@@ -12,6 +12,11 @@ import (
 	"github.com/swaggo/swag"
 )
 
+type QueryStringParam struct {
+	Key   string
+	Value string
+}
+
 // Config stores echoSwagger configuration variables.
 type Config struct {
 	// The url pointing to API definition (normally swagger.json or swagger.yaml). Default is `mockedSwag.json`.
@@ -38,6 +43,9 @@ type OAuthConfig struct {
 
 	// The name to display for the application in the authentication popup.
 	AppName string
+
+	// Additional query parameters added to authorizationUrl and tokenUrl.
+	AdditionalQueryStringParams []QueryStringParam
 }
 
 // URL presents the url pointing to API definition (normally swagger.json or swagger.yaml).
@@ -298,7 +306,8 @@ window.onload = function() {
   ui.initOAuth({
     clientId: "{{.OAuth.ClientId}}",
     realm: "{{.OAuth.Realm}}",
-    appName: "{{.OAuth.AppName}}"
+    appName: "{{.OAuth.AppName}}",
+    {{if .OAuth.AdditionalQueryStringParams}}additionalQueryStringParams: { {{range $i, $param := .OAuth.AdditionalQueryStringParams}}{{if $i}}, {{end}}{{$param.Key}}:{{$param.Value}}{{end}} }{{end}}
   })
   {{end}}
 
