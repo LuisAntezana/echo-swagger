@@ -38,6 +38,9 @@ type OAuthConfig struct {
 
 	// The name to display for the application in the authentication popup.
 	AppName string
+
+	// Additional query parameters added to authorizationUrl and tokenUrl.
+	AdditionalQueryStringParams map[string]string
 }
 
 // URL presents the url pointing to API definition (normally swagger.json or swagger.yaml).
@@ -297,8 +300,11 @@ window.onload = function() {
   {{if .OAuth}}
   ui.initOAuth({
     clientId: "{{.OAuth.ClientId}}",
-    realm: "{{.OAuth.Realm}}",
-    appName: "{{.OAuth.AppName}}"
+	realm: "{{.OAuth.Realm}}",
+	appName: "{{.OAuth.AppName}}",
+	{{if .OAuth.AdditionalQueryStringParams}}
+	additionalQueryStringParams: {{range $key, $value := .OAuth.AdditionalQueryStringParams}} { {{$key}}: {{$value}} },{{end}}
+	{{end}}
   })
   {{end}}
 
